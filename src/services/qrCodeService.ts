@@ -13,6 +13,20 @@ const encodeMailtoParam = (value: string): string => {
     .replace(/[!'()*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
 };
 
+/**
+ * Prepare email addresses for mailto URLs
+ * Splits by comma, trims whitespace, and joins back
+ * Email addresses themselves don't need encoding in mailto URLs per RFC 6068
+ */
+const prepareEmailAddresses = (emails: string): string => {
+  // Split by comma, trim whitespace, then join back
+  return emails
+    .split(',')
+    .map(email => email.trim())
+    .filter(email => email.length > 0)
+    .join(',');
+};
+
 export const qrCodeService = {
   /**
    * Generate a QR code data URL from a QR code entry
@@ -24,13 +38,14 @@ export const qrCodeService = {
       content = entry.link;
     } else if (entry.type === 'email' && entry.email) {
       // Create mailto: link with email parameters using RFC 6068 encoding
-      const mailto = `mailto:${entry.email.to}`;
+      // Add CC recipients to the "to" field as some mobile clients don't support the cc parameter
+      let toField = entry.email.to;
+      if (entry.email.cc) {
+        toField += ',' + entry.email.cc;
+      }
+      const mailto = `mailto:${prepareEmailAddresses(toField)}`;
       const params: string[] = [];
 
-      // Email addresses in CC should NOT be percent-encoded, only subject/body
-      if (entry.email.cc) {
-        params.push(`cc=${entry.email.cc}`);
-      }
       if (entry.email.subject) {
         params.push(`subject=${encodeMailtoParam(entry.email.subject)}`);
       }

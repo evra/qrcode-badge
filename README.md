@@ -1,12 +1,12 @@
-# QR Code Badge Generator# QR Code Badge Generator# React + TypeScript + Vite
+# QR Code Badge Generator
+
+A web application for generating QR codes and placing them in printable PDFs with a visual template designer. Supports bulk generation and CSV data import. Built with React, TypeScript, and Material-UI, featuring **PDFme** for powerful drag-and-drop PDF template editing.
+
+Demo: https://evra.github.io/qrcode-badge/ 
 
 
-
-A web application for generating QR codes and placing them in printable PDFs with a visual template designer. Built with React, TypeScript, and Material-UI, featuring **PDFme** for powerful drag-and-drop PDF template editing.
-
-
-
-## FeaturesA web application for generating QR codes and placing them in printable PDFs with configurable layouts. Built with React, TypeScript, and Material-UI.This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Features
+A web application for generating QR codes and placing them in printable PDFs with configurable layouts. Built with React, TypeScript, and Material-UI.This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 
 

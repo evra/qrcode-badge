@@ -4,6 +4,7 @@ A web application for generating QR codes and placing them in printable PDFs wit
 
 Demo: https://evra.github.io/qrcode-badge/ 
 
+**The apps doesn't send any data to a remote server. All data remains in your browser.** 
 
 ## Features
 A web application for generating QR codes and placing them in printable PDFs with configurable layouts. Built with React, TypeScript, and Material-UI.This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

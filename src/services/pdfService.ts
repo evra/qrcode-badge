@@ -19,6 +19,16 @@ export const pdfService = {
    * Generate a PDF with QR codes based on the pdfme template
    */
   generatePDF: async (entries: QRCodeEntry[], template: PDFTemplateWrapper): Promise<void> => {
+    // Collect all field names from the template schema
+    const fieldNames = new Set<string>();
+    template.pdfmeTemplate.schemas.forEach((schema) => {
+      schema.forEach((field: any) => {
+        if (field.name) {
+          fieldNames.add(field.name);
+        }
+      });
+    });
+
     // Prepare inputs for pdfme - one input per entry
     const inputs = await Promise.all(
       entries.map(async (entry) => {
@@ -36,11 +46,23 @@ export const pdfService = {
           qrContent = params.length > 0 ? `${mailto}?${params.join('&')}` : mailto;
         }
 
-        return {
+        // Create input object with all template fields
+        // Start with our core data fields
+        const input: Record<string, string> = {
           qrcode: qrContent,
           title: entry.title,
           subtitle: entry.subtitle,
         };
+
+        // Add empty strings for any other fields in the template
+        // This allows static images and text fields to be rendered
+        fieldNames.forEach((fieldName) => {
+          if (!(fieldName in input)) {
+            input[fieldName] = '';
+          }
+        });
+
+        return input;
       })
     );
 
@@ -77,6 +99,16 @@ export const pdfService = {
    * Preview a single QR code entry
    */
   previewEntry: async (entry: QRCodeEntry, template: PDFTemplateWrapper): Promise<Blob> => {
+    // Collect all field names from the template schema
+    const fieldNames = new Set<string>();
+    template.pdfmeTemplate.schemas.forEach((schema) => {
+      schema.forEach((field: any) => {
+        if (field.name) {
+          fieldNames.add(field.name);
+        }
+      });
+    });
+
     // Generate QR code content
     let qrContent = '';
     if (entry.type === 'link' && entry.link) {
@@ -91,13 +123,21 @@ export const pdfService = {
       qrContent = params.length > 0 ? `${mailto}?${params.join('&')}` : mailto;
     }
 
-    const inputs = [
-      {
-        qrcode: qrContent,
-        title: entry.title,
-        subtitle: entry.subtitle,
-      },
-    ];
+    // Create input object with all template fields
+    const input: Record<string, string> = {
+      qrcode: qrContent,
+      title: entry.title,
+      subtitle: entry.subtitle,
+    };
+
+    // Add empty strings for any other fields in the template
+    fieldNames.forEach((fieldName) => {
+      if (!(fieldName in input)) {
+        input[fieldName] = '';
+      }
+    });
+
+    const inputs = [input];
 
     // Generate PDF using pdfme
     const pdf = await generate({

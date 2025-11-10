@@ -347,6 +347,14 @@ npm run build
 
 The built files will be in the `dist` directory.
 
+## Deployment
+
+This app is configured to automatically deploy to GitHub Pages when changes are merged into the `production` branch.
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed setup instructions.
+
+**Live Demo**: The app will be available at `https://<your-username>.github.io/qrcode-badge/` after deployment.
+
 ## Development
 
 ```bash

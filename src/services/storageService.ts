@@ -1,4 +1,4 @@
-import type { QRCodeEntry, PDFTemplate } from '../types';
+import type { QRCodeEntry, PDFTemplateWrapper } from '../types';
 import { DEFAULT_TEMPLATE } from '../types';
 
 const QRCODE_ENTRIES_KEY = 'qrcode_entries';
@@ -37,7 +37,7 @@ export const storageService = {
   },
 
   // PDF Templates
-  getPDFTemplates: (): PDFTemplate[] => {
+  getPDFTemplates: (): PDFTemplateWrapper[] => {
     const data = localStorage.getItem(PDF_TEMPLATES_KEY);
     if (!data) {
       // Initialize with default template
@@ -45,20 +45,48 @@ export const storageService = {
       storageService.savePDFTemplates(defaultTemplates);
       return defaultTemplates;
     }
-    return JSON.parse(data);
+    
+    try {
+      const templates = JSON.parse(data);
+      
+      // Validate and migrate old format if needed
+      const validTemplates = templates.filter((t: any) => {
+        // Check if it's the old format (has pageSize, orientation, etc.)
+        if (t.pageSize || t.orientation || !t.pdfmeTemplate) {
+          console.warn('Old template format detected, skipping:', t);
+          return false;
+        }
+        return t.pdfmeTemplate && t.id && t.name;
+      });
+      
+      // If no valid templates, return default
+      if (validTemplates.length === 0) {
+        console.log('No valid templates found, using default');
+        const defaultTemplates = [DEFAULT_TEMPLATE];
+        storageService.savePDFTemplates(defaultTemplates);
+        return defaultTemplates;
+      }
+      
+      return validTemplates;
+    } catch (error) {
+      console.error('Error parsing templates:', error);
+      const defaultTemplates = [DEFAULT_TEMPLATE];
+      storageService.savePDFTemplates(defaultTemplates);
+      return defaultTemplates;
+    }
   },
 
-  savePDFTemplates: (templates: PDFTemplate[]): void => {
+  savePDFTemplates: (templates: PDFTemplateWrapper[]): void => {
     localStorage.setItem(PDF_TEMPLATES_KEY, JSON.stringify(templates));
   },
 
-  addPDFTemplate: (template: PDFTemplate): void => {
+  addPDFTemplate: (template: PDFTemplateWrapper): void => {
     const templates = storageService.getPDFTemplates();
     templates.push(template);
     storageService.savePDFTemplates(templates);
   },
 
-  updatePDFTemplate: (id: string, updatedTemplate: PDFTemplate): void => {
+  updatePDFTemplate: (id: string, updatedTemplate: PDFTemplateWrapper): void => {
     const templates = storageService.getPDFTemplates();
     const index = templates.findIndex((t) => t.id === id);
     if (index !== -1) {

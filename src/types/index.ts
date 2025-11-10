@@ -1,3 +1,5 @@
+import type { Template } from '@pdfme/common';
+
 export type QRCodeType = 'link' | 'email';
 
 export interface EmailData {
@@ -18,36 +20,46 @@ export interface QRCodeEntry {
   email?: EmailData;
 }
 
-export interface PDFTemplate {
+export interface PDFTemplateWrapper {
   id: string;
   name: string;
-  pageSize: 'A4' | 'Letter' | 'A5';
-  orientation: 'portrait' | 'landscape';
-  qrCodeSize: number; // in mm
-  qrCodeX: number; // position in mm
-  qrCodeY: number; // position in mm
-  titleX: number;
-  titleY: number;
-  titleFontSize: number;
-  subtitleX: number;
-  subtitleY: number;
-  subtitleFontSize: number;
-  itemsPerPage: number;
+  pdfmeTemplate: Template;
 }
 
-export const DEFAULT_TEMPLATE: PDFTemplate = {
+// Default pdfme template for QR code badges
+export const DEFAULT_PDFME_TEMPLATE: Template = {
+  basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] }, // A4 in mm
+  schemas: [
+    [
+      {
+        type: 'qrcode',
+        name: 'qrcode',
+        position: { x: 30, y: 40 },
+        width: 50,
+        height: 50,
+      },
+      {
+        type: 'text',
+        name: 'title',
+        position: { x: 30, y: 100 },
+        width: 150,
+        height: 10,
+        fontSize: 16,
+      },
+      {
+        type: 'text',
+        name: 'subtitle',
+        position: { x: 30, y: 115 },
+        width: 150,
+        height: 8,
+        fontSize: 12,
+      },
+    ],
+  ],
+};
+
+export const DEFAULT_TEMPLATE: PDFTemplateWrapper = {
   id: 'default',
   name: 'Default Template',
-  pageSize: 'A4',
-  orientation: 'portrait',
-  qrCodeSize: 50,
-  qrCodeX: 30,
-  qrCodeY: 40,
-  titleX: 30,
-  titleY: 100,
-  titleFontSize: 16,
-  subtitleX: 30,
-  subtitleY: 110,
-  subtitleFontSize: 12,
-  itemsPerPage: 1,
+  pdfmeTemplate: DEFAULT_PDFME_TEMPLATE,
 };

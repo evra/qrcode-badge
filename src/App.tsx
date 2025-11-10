@@ -13,8 +13,8 @@ import {
 import { PictureAsPdf as PdfIcon } from '@mui/icons-material';
 import { QRCodeTable } from './components/QRCodeTable';
 import { CSVImport } from './components/CSVImport';
-import { PDFTemplateConfig } from './components/PDFTemplateConfig';
-import type { PDFTemplate } from './types';
+import { PDFmeTemplateDesigner } from './components/PDFmeTemplateDesigner';
+import type { PDFTemplateWrapper } from './types';
 import { storageService } from './services/storageService';
 import { pdfService } from './services/pdfService';
 import './App.css';
@@ -43,7 +43,7 @@ function TabPanel(props: TabPanelProps) {
 
 function App() {
   const [tabValue, setTabValue] = useState(0);
-  const [currentTemplate, setCurrentTemplate] = useState<PDFTemplate | null>(null);
+  const [currentTemplate, setCurrentTemplate] = useState<PDFTemplateWrapper | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -113,7 +113,7 @@ function App() {
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            <PDFTemplateConfig onTemplateChange={setCurrentTemplate} />
+            <PDFmeTemplateDesigner onTemplateChange={setCurrentTemplate} />
           </TabPanel>
         </Paper>
 

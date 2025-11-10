@@ -1,113 +1,111 @@
-import jsPDF from 'jspdf';
-import type { QRCodeEntry, PDFTemplate } from '../types';
-import { qrCodeService } from './qrCodeService';
+import { generate } from '@pdfme/generator';
+import { text, image, barcodes } from '@pdfme/schemas';
+import type { QRCodeEntry, PDFTemplateWrapper } from '../types';
 
 export const pdfService = {
   /**
-   * Generate a PDF with QR codes based on the template
+   * Generate a PDF with QR codes based on the pdfme template
    */
-  generatePDF: async (entries: QRCodeEntry[], template: PDFTemplate): Promise<void> => {
-    // Generate all QR codes first
-    const qrCodes = await qrCodeService.generateBatch(entries);
-
-    // Create PDF with specified page size and orientation
-    const pdf = new jsPDF({
-      orientation: template.orientation,
-      unit: 'mm',
-      format: template.pageSize.toLowerCase() as 'a4' | 'letter' | 'a5',
-    });
-
-    let isFirstPage = true;
-
-    // Process entries based on items per page
-    for (let i = 0; i < entries.length; i += template.itemsPerPage) {
-      if (!isFirstPage) {
-        pdf.addPage();
-      }
-      isFirstPage = false;
-
-      // Get entries for current page
-      const pageEntries = entries.slice(i, i + template.itemsPerPage);
-
-      // Calculate vertical spacing for multiple items per page
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const spacing = template.itemsPerPage > 1 
-        ? pageHeight / template.itemsPerPage 
-        : 0;
-
-      // Add each entry to the page
-      pageEntries.forEach((entry, index) => {
-        const yOffset = spacing * index;
-        const qrCodeDataUrl = qrCodes.get(entry.id);
-
-        if (qrCodeDataUrl) {
-          // Add QR code image
-          pdf.addImage(
-            qrCodeDataUrl,
-            'PNG',
-            template.qrCodeX,
-            template.qrCodeY + yOffset,
-            template.qrCodeSize,
-            template.qrCodeSize
-          );
+  generatePDF: async (entries: QRCodeEntry[], template: PDFTemplateWrapper): Promise<void> => {
+    // Prepare inputs for pdfme - one input per entry
+    const inputs = await Promise.all(
+      entries.map(async (entry) => {
+        // Generate QR code content
+        let qrContent = '';
+        if (entry.type === 'link' && entry.link) {
+          qrContent = entry.link;
+        } else if (entry.type === 'email' && entry.email) {
+          const mailto = `mailto:${entry.email.to}`;
+          const params = new URLSearchParams();
+          if (entry.email.cc) params.append('cc', entry.email.cc);
+          if (entry.email.subject) params.append('subject', entry.email.subject);
+          if (entry.email.body) params.append('body', entry.email.body);
+          const queryString = params.toString();
+          qrContent = queryString ? `${mailto}?${queryString}` : mailto;
         }
 
-        // Add title
-        pdf.setFontSize(template.titleFontSize);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(
-          entry.title,
-          template.titleX,
-          template.titleY + yOffset
-        );
+        return {
+          qrcode: qrContent,
+          title: entry.title,
+          subtitle: entry.subtitle,
+        };
+      })
+    );
 
-        // Add subtitle
-        pdf.setFontSize(template.subtitleFontSize);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(
-          entry.subtitle,
-          template.subtitleX,
-          template.subtitleY + yOffset
-        );
-      });
-    }
+    // Generate PDF using pdfme
+    const pdf = await generate({
+      template: template.pdfmeTemplate,
+      inputs,
+      options: {
+        font: {
+          Roboto: {
+            data: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf',
+            fallback: true,
+          },
+        },
+      },
+      plugins: {
+        text,
+        image,
+        qrcode: barcodes.qrcode,
+      },
+    });
 
-    // Save the PDF
-    pdf.save('qr-codes.pdf');
+    // Convert to blob and download
+    const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'qr-codes.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
   },
 
   /**
    * Preview a single QR code entry
    */
-  previewEntry: async (entry: QRCodeEntry, template: PDFTemplate): Promise<Blob> => {
-    const qrCodeDataUrl = await qrCodeService.generateQRCode(entry);
+  previewEntry: async (entry: QRCodeEntry, template: PDFTemplateWrapper): Promise<Blob> => {
+    // Generate QR code content
+    let qrContent = '';
+    if (entry.type === 'link' && entry.link) {
+      qrContent = entry.link;
+    } else if (entry.type === 'email' && entry.email) {
+      const mailto = `mailto:${entry.email.to}`;
+      const params = new URLSearchParams();
+      if (entry.email.cc) params.append('cc', entry.email.cc);
+      if (entry.email.subject) params.append('subject', entry.email.subject);
+      if (entry.email.body) params.append('body', entry.email.body);
+      const queryString = params.toString();
+      qrContent = queryString ? `${mailto}?${queryString}` : mailto;
+    }
 
-    const pdf = new jsPDF({
-      orientation: template.orientation,
-      unit: 'mm',
-      format: template.pageSize.toLowerCase() as 'a4' | 'letter' | 'a5',
+    const inputs = [
+      {
+        qrcode: qrContent,
+        title: entry.title,
+        subtitle: entry.subtitle,
+      },
+    ];
+
+    // Generate PDF using pdfme
+    const pdf = await generate({
+      template: template.pdfmeTemplate,
+      inputs,
+      options: {
+        font: {
+          Roboto: {
+            data: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf',
+            fallback: true,
+          },
+        },
+      },
+      plugins: {
+        text,
+        image,
+        qrcode: barcodes.qrcode,
+      },
     });
 
-    // Add QR code image
-    pdf.addImage(
-      qrCodeDataUrl,
-      'PNG',
-      template.qrCodeX,
-      template.qrCodeY,
-      template.qrCodeSize,
-      template.qrCodeSize
-    );
-
-    // Add title
-    pdf.setFontSize(template.titleFontSize);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(entry.title, template.titleX, template.titleY);
-
-    // Add subtitle
-    pdf.setFontSize(template.subtitleFontSize);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(entry.subtitle, template.subtitleX, template.subtitleY);
-
-    return pdf.output('blob');
+    return new Blob([pdf.buffer], { type: 'application/pdf' });
   },
 };

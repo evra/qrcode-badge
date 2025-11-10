@@ -2,6 +2,18 @@ import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import type { QRCodeEntry, PDFTemplateWrapper } from '../types';
 
+/**
+ * Encode a string for use in mailto URLs according to RFC 6068
+ * This properly handles UTF-8 characters without over-encoding
+ */
+const encodeMailtoParam = (value: string): string => {
+  // Use encodeURIComponent but keep it readable where possible
+  // RFC 6068 allows UTF-8 characters in mailto URLs
+  return encodeURIComponent(value)
+    .replace(/%20/g, '%20') // Keep spaces as %20 (not +)
+    .replace(/[!'()*]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+};
+
 export const pdfService = {
   /**
    * Generate a PDF with QR codes based on the pdfme template
@@ -16,12 +28,12 @@ export const pdfService = {
           qrContent = entry.link;
         } else if (entry.type === 'email' && entry.email) {
           const mailto = `mailto:${entry.email.to}`;
-          const params = new URLSearchParams();
-          if (entry.email.cc) params.append('cc', entry.email.cc);
-          if (entry.email.subject) params.append('subject', entry.email.subject);
-          if (entry.email.body) params.append('body', entry.email.body);
-          const queryString = params.toString();
-          qrContent = queryString ? `${mailto}?${queryString}` : mailto;
+          const params: string[] = [];
+          // Email addresses in CC should NOT be percent-encoded, only subject/body
+          if (entry.email.cc) params.push(`cc=${entry.email.cc}`);
+          if (entry.email.subject) params.push(`subject=${encodeMailtoParam(entry.email.subject)}`);
+          if (entry.email.body) params.push(`body=${encodeMailtoParam(entry.email.body)}`);
+          qrContent = params.length > 0 ? `${mailto}?${params.join('&')}` : mailto;
         }
 
         return {
@@ -71,12 +83,12 @@ export const pdfService = {
       qrContent = entry.link;
     } else if (entry.type === 'email' && entry.email) {
       const mailto = `mailto:${entry.email.to}`;
-      const params = new URLSearchParams();
-      if (entry.email.cc) params.append('cc', entry.email.cc);
-      if (entry.email.subject) params.append('subject', entry.email.subject);
-      if (entry.email.body) params.append('body', entry.email.body);
-      const queryString = params.toString();
-      qrContent = queryString ? `${mailto}?${queryString}` : mailto;
+      const params: string[] = [];
+      // Email addresses in CC should NOT be percent-encoded, only subject/body
+      if (entry.email.cc) params.push(`cc=${entry.email.cc}`);
+      if (entry.email.subject) params.push(`subject=${encodeMailtoParam(entry.email.subject)}`);
+      if (entry.email.body) params.push(`body=${encodeMailtoParam(entry.email.body)}`);
+      qrContent = params.length > 0 ? `${mailto}?${params.join('&')}` : mailto;
     }
 
     const inputs = [

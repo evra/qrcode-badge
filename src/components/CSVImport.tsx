@@ -33,6 +33,9 @@ export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete, onNotifi
     Papa.parse<CSVRow>(file, {
       header: true,
       skipEmptyLines: true,
+      encoding: 'UTF-8',
+      delimiter: ';',
+      delimitersToGuess: [';', ',', '\t', '|'],
       complete: (results) => {
         const entries: QRCodeEntry[] = results.data
           .filter((row) => row.type && row.title)

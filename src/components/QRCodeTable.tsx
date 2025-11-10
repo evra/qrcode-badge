@@ -22,6 +22,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import type { QRCodeEntry, QRCodeType } from '../types';
 import { storageService } from '../services/storageService';
 
@@ -31,6 +32,7 @@ interface QRCodeTableProps {
 }
 
 export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotification }) => {
+  const { t } = useTranslation();
   const [entries, setEntries] = useState<QRCodeEntry[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEntry, setEditingEntry] = useState<QRCodeEntry | null>(null);
@@ -75,17 +77,17 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
 
   const handleSave = () => {
     if (!formData.title || !formData.type) {
-      onNotification?.('Please fill in all required fields', 'warning');
+      onNotification?.(t('notifications.fillRequired'), 'warning');
       return;
     }
 
     if (formData.type === 'link' && !formData.link) {
-      onNotification?.('Please provide a link', 'warning');
+      onNotification?.(t('notifications.provideLink'), 'warning');
       return;
     }
 
     if (formData.type === 'email' && (!formData.email?.to || !formData.email?.subject)) {
-      onNotification?.('Please provide email recipient and subject', 'warning');
+      onNotification?.(t('notifications.provideEmail'), 'warning');
       return;
     }
 
@@ -121,9 +123,9 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
   return (
     <Box>
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h6">QR Code Entries</Typography>
+        <Typography variant="h6">{t('qrCodeTable.title')}</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-          Add Entry
+          {t('qrCodeTable.addEntry')}
         </Button>
       </Box>
 
@@ -131,11 +133,11 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Type</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell>Subtitle</TableCell>
-              <TableCell>Content</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>{t('qrCodeTable.columns.type')}</TableCell>
+              <TableCell>{t('qrCodeTable.columns.title')}</TableCell>
+              <TableCell>{t('qrCodeTable.columns.subtitle')}</TableCell>
+              <TableCell>{t('qrCodeTable.columns.content')}</TableCell>
+              <TableCell>{t('qrCodeTable.columns.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -148,7 +150,7 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
                   {entry.type === 'link' ? (
                     entry.link
                   ) : (
-                    `To: ${entry.email?.to}, Subject: ${entry.email?.subject}`
+                    t('qrCodeTable.contentEmail', { to: entry.email?.to, subject: entry.email?.subject })
                   )}
                 </TableCell>
                 <TableCell>
@@ -164,7 +166,7 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
             {entries.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
-                  No entries yet. Click "Add Entry" to create one.
+                  {t('qrCodeTable.noEntries')}
                 </TableCell>
               </TableRow>
             )}
@@ -173,31 +175,31 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
       </TableContainer>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingEntry ? 'Edit Entry' : 'Add Entry'}</DialogTitle>
+        <DialogTitle>{editingEntry ? t('qrCodeTable.dialog.editTitle') : t('qrCodeTable.dialog.addTitle')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
             <FormControl fullWidth>
-              <InputLabel>Type</InputLabel>
+              <InputLabel>{t('qrCodeTable.dialog.type')}</InputLabel>
               <Select
                 value={formData.type || 'link'}
-                label="Type"
+                label={t('qrCodeTable.dialog.type')}
                 onChange={(e) => handleTypeChange(e.target.value as QRCodeType)}
               >
-                <MenuItem value="link">Link</MenuItem>
-                <MenuItem value="email">Email</MenuItem>
+                <MenuItem value="link">{t('qrCodeTable.dialog.typeLink')}</MenuItem>
+                <MenuItem value="email">{t('qrCodeTable.dialog.typeEmail')}</MenuItem>
               </Select>
             </FormControl>
 
             <TextField
               fullWidth
-              label="Title"
+              label={t('qrCodeTable.dialog.titleLabel')}
               value={formData.title || ''}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
 
             <TextField
               fullWidth
-              label="Subtitle"
+              label={t('qrCodeTable.dialog.subtitleLabel')}
               value={formData.subtitle || ''}
               onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
             />
@@ -205,7 +207,7 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
             {formData.type === 'link' && (
               <TextField
                 fullWidth
-                label="Link URL"
+                label={t('qrCodeTable.dialog.linkUrl')}
                 value={formData.link || ''}
                 onChange={(e) => setFormData({ ...formData, link: e.target.value })}
               />
@@ -215,7 +217,7 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
               <>
                 <TextField
                   fullWidth
-                  label="To (Email)"
+                  label={t('qrCodeTable.dialog.emailTo')}
                   value={formData.email?.to || ''}
                   onChange={(e) =>
                     setFormData({
@@ -226,7 +228,7 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
                 />
                 <TextField
                   fullWidth
-                  label="CC (Optional)"
+                  label={t('qrCodeTable.dialog.emailCc')}
                   value={formData.email?.cc || ''}
                   onChange={(e) =>
                     setFormData({
@@ -237,7 +239,7 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
                 />
                 <TextField
                   fullWidth
-                  label="Subject"
+                  label={t('qrCodeTable.dialog.emailSubject')}
                   value={formData.email?.subject || ''}
                   onChange={(e) =>
                     setFormData({
@@ -248,7 +250,7 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
                 />
                 <TextField
                   fullWidth
-                  label="Body"
+                  label={t('qrCodeTable.dialog.emailBody')}
                   multiline
                   rows={4}
                   value={formData.email?.body || ''}
@@ -264,9 +266,9 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotifi
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenDialog(false)}>{t('qrCodeTable.dialog.cancel')}</Button>
           <Button onClick={handleSave} variant="contained">
-            Save
+            {t('qrCodeTable.dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

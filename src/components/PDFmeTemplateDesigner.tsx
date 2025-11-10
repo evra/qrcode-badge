@@ -15,6 +15,7 @@ import {
   Divider,
 } from '@mui/material';
 import { Save as SaveIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import type { PDFTemplateWrapper } from '../types';
 import { storageService } from '../services/storageService';
 
@@ -27,6 +28,7 @@ export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
   onTemplateChange,
   onNotification,
 }) => {
+  const { t } = useTranslation();
   const designerRef = useRef<HTMLDivElement>(null);
   const designerInstanceRef = useRef<Designer | null>(null);
   const [templates, setTemplates] = useState<PDFTemplateWrapper[]>([]);
@@ -125,7 +127,7 @@ export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
     storageService.updatePDFTemplate(updatedTemplate.id, updatedTemplate);
     loadTemplates();
     onTemplateChange?.(updatedTemplate);
-    onNotification?.('Template saved successfully!', 'success');
+    onNotification?.(t('notifications.templateSaved'), 'success');
   };
 
   const handleCreateNew = () => {
@@ -184,9 +186,9 @@ export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
     console.log('Has pdfmeTemplate:', currentTemplate?.pdfmeTemplate);
     return (
       <Paper sx={{ p: 3 }}>
-        <Typography variant="body1">Loading template designer...</Typography>
+        <Typography variant="body1">{t('pdfTemplateDesigner.loading')}</Typography>
         <Typography variant="caption" color="text.secondary">
-          Debug: {!currentTemplate ? 'No template' : 'No pdfmeTemplate property'}
+          Debug: {!currentTemplate ? t('pdfTemplateDesigner.debugNoTemplate') : t('pdfTemplateDesigner.debugNoPdfmeTemplate')}
         </Typography>
       </Paper>
     );
@@ -196,18 +198,18 @@ export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
     <Paper sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          PDF Template Designer (PDFme)
+          {t('pdfTemplateDesigner.title')}
         </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          Use the visual designer below to customize your PDF template. Drag and drop elements, resize them, and configure their properties.
+          {t('pdfTemplateDesigner.description')}
         </Typography>
 
         <Box sx={{ display: 'flex', gap: 2, mt: 2, mb: 2 }}>
           <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Select Template</InputLabel>
+            <InputLabel>{t('pdfTemplateDesigner.selectTemplate')}</InputLabel>
             <Select
               value={selectedTemplateId}
-              label="Select Template"
+              label={t('pdfTemplateDesigner.selectTemplate')}
               onChange={(e) => handleTemplateSelect(e.target.value)}
             >
               {templates.map((template) => (
@@ -219,18 +221,18 @@ export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
           </FormControl>
 
           <TextField
-            label="Template Name"
+            label={t('pdfTemplateDesigner.templateName')}
             value={currentTemplate?.name || ''}
             onChange={(e) => handleNameChange(e.target.value)}
             sx={{ flexGrow: 1 }}
           />
 
           <Button variant="outlined" onClick={handleCreateNew}>
-            Create New
+            {t('pdfTemplateDesigner.createNew')}
           </Button>
 
           <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSave}>
-            Save
+            {t('pdfTemplateDesigner.save')}
           </Button>
         </Box>
 
@@ -238,8 +240,7 @@ export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
 
         <Box sx={{ mt: 2, p: 2, bgcolor: 'info.light', borderRadius: 1 }}>
           <Typography variant="body2" color="info.contrastText">
-            <strong>Field Names:</strong> Use 'qrcode' for QR codes, 'title' for titles, and 'subtitle' for subtitles.
-            The designer will automatically populate these fields when generating PDFs.
+            <strong>{t('pdfTemplateDesigner.fieldNames')}</strong> {t('pdfTemplateDesigner.fieldNamesDescription')}
           </Typography>
         </Box>
       </Box>

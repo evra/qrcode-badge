@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Button, Box, Typography } from '@mui/material';
 import { Upload as UploadIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import Papa from 'papaparse';
 import type { QRCodeEntry } from '../types';
 import { storageService } from '../services/storageService';
@@ -22,6 +23,7 @@ interface CSVRow {
 }
 
 export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete, onNotification }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +62,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete, onNotifi
         const existingEntries = storageService.getQRCodeEntries();
         storageService.saveQRCodeEntries([...existingEntries, ...entries]);
 
-        onNotification?.(`Successfully imported ${entries.length} entries`, 'success');
+        onNotification?.(t('notifications.importSuccess', { count: entries.length }), 'success');
         onImportComplete();
 
         // Reset file input
@@ -69,7 +71,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete, onNotifi
         }
       },
       error: (error) => {
-        onNotification?.(`Error parsing CSV: ${error.message}`, 'error');
+        onNotification?.(t('notifications.importError', { message: error.message }), 'error');
       },
     });
   };
@@ -102,13 +104,13 @@ email,Example Email,Contact us,,contact@example.com,cc@example.com,Hello,This is
         startIcon={<UploadIcon />}
         onClick={() => fileInputRef.current?.click()}
       >
-        Import CSV
+        {t('csvImport.import')}
       </Button>
       <Button variant="text" size="small" onClick={handleDownloadTemplate}>
-        Download Template
+        {t('csvImport.downloadTemplate')}
       </Button>
       <Typography variant="caption" color="text.secondary">
-        CSV format: type, title, subtitle, link, email_to, email_cc, email_subject, email_body
+        {t('csvImport.format')}
       </Typography>
     </Box>
   );

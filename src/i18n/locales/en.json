@@ -1,0 +1,94 @@
+{
+  "app": {
+    "title": "QR Code Badge Generator",
+    "generatePDF": "Generate PDF",
+    "generating": "Generating..."
+  },
+  "tabs": {
+    "qrCodeData": "QR Code Data",
+    "pdfTemplate": "PDF Template"
+  },
+  "notifications": {
+    "noEntries": "No QR code entries found. Please add some entries first.",
+    "noTemplate": "No template selected. Please configure a template first.",
+    "pdfSuccess": "PDF generated successfully!",
+    "pdfError": "Error generating PDF. Please check the console for details.",
+    "importSuccess": "Successfully imported {{count}} entries",
+    "importError": "Error parsing CSV: {{message}}",
+    "templateSaved": "Template saved successfully!",
+    "fillRequired": "Please fill in all required fields",
+    "provideLink": "Please provide a link",
+    "provideEmail": "Please provide email recipient and subject"
+  },
+  "howToUse": {
+    "title": "How to Use",
+    "step1": {
+      "title": "Add QR Code Data:",
+      "description": "Use the \"QR Code Data\" tab to manually add entries or import from a CSV file. Each entry can be either a link or an email message."
+    },
+    "step2": {
+      "title": "Configure Template:",
+      "description": "Switch to the \"PDF Template\" tab to customize the layout, including page size, QR code position, and text formatting."
+    },
+    "step3": {
+      "title": "Generate PDF:",
+      "description": "Click the \"Generate PDF\" button in the top right to create your printable PDF with all QR codes."
+    },
+    "localStorageNote": "All data is stored locally in your browser. Your data will persist between sessions."
+  },
+  "footer": {
+    "text": "QR Code Badge Generator - All data is stored locally in your browser"
+  },
+  "csvImport": {
+    "import": "Import CSV",
+    "downloadTemplate": "Download Template",
+    "format": "CSV format: type, title, subtitle, link, email_to, email_cc, email_subject, email_body"
+  },
+  "qrCodeTable": {
+    "title": "QR Code Entries",
+    "addEntry": "Add Entry",
+    "columns": {
+      "type": "Type",
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "content": "Content",
+      "actions": "Actions"
+    },
+    "contentEmail": "To: {{to}}, Subject: {{subject}}",
+    "noEntries": "No entries yet. Click \"Add Entry\" to create one.",
+    "dialog": {
+      "addTitle": "Add Entry",
+      "editTitle": "Edit Entry",
+      "type": "Type",
+      "typeLink": "Link",
+      "typeEmail": "Email",
+      "titleLabel": "Title",
+      "subtitleLabel": "Subtitle",
+      "linkUrl": "Link URL",
+      "emailTo": "To (Email)",
+      "emailCc": "CC (Optional)",
+      "emailSubject": "Subject",
+      "emailBody": "Body",
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "pdfTemplateDesigner": {
+    "title": "PDF Template Designer (PDFme)",
+    "description": "Use the visual designer below to customize your PDF template. Drag and drop elements, resize them, and configure their properties.",
+    "selectTemplate": "Select Template",
+    "templateName": "Template Name",
+    "createNew": "Create New",
+    "save": "Save",
+    "fieldNames": "Field Names:",
+    "fieldNamesDescription": "Use 'qrcode' for QR codes, 'title' for titles, and 'subtitle' for subtitles. The designer will automatically populate these fields when generating PDFs.",
+    "loading": "Loading template designer...",
+    "debugNoTemplate": "No template",
+    "debugNoPdfmeTemplate": "No pdfmeTemplate property"
+  },
+  "language": {
+    "select": "Language",
+    "en": "English",
+    "de": "Deutsch"
+  }
+}

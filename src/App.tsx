@@ -11,8 +11,12 @@ import {
   Paper,
   Snackbar,
   Alert,
+  Select,
+  MenuItem,
+  FormControl,
 } from '@mui/material';
-import { PictureAsPdf as PdfIcon } from '@mui/icons-material';
+import { PictureAsPdf as PdfIcon, Language as LanguageIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { QRCodeTable } from './components/QRCodeTable';
 import { CSVImport } from './components/CSVImport';
 import { PDFmeTemplateDesigner } from './components/PDFmeTemplateDesigner';
@@ -44,6 +48,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
   const [currentTemplate, setCurrentTemplate] = useState<PDFTemplateWrapper | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -57,6 +62,11 @@ function App() {
     message: '',
     severity: 'info',
   });
+
+  const handleLanguageChange = (language: string) => {
+    i18n.changeLanguage(language);
+    localStorage.setItem('language', language);
+  };
 
   const showSnackbar = (message: string, severity: 'success' | 'error' | 'warning' | 'info') => {
     setSnackbar({ open: true, message, severity });
@@ -78,22 +88,22 @@ function App() {
     const entries = storageService.getQRCodeEntries();
     
     if (entries.length === 0) {
-      showSnackbar('No QR code entries found. Please add some entries first.', 'warning');
+      showSnackbar(t('notifications.noEntries'), 'warning');
       return;
     }
 
     if (!currentTemplate) {
-      showSnackbar('No template selected. Please configure a template first.', 'warning');
+      showSnackbar(t('notifications.noTemplate'), 'warning');
       return;
     }
 
     setIsGenerating(true);
     try {
       await pdfService.generatePDF(entries, currentTemplate);
-      showSnackbar('PDF generated successfully!', 'success');
+      showSnackbar(t('notifications.pdfSuccess'), 'success');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      showSnackbar('Error generating PDF. Please check the console for details.', 'error');
+      showSnackbar(t('notifications.pdfError'), 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -104,15 +114,26 @@ function App() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            QR Code Badge Generator
+            {t('app.title')}
           </Typography>
+          <FormControl sx={{ minWidth: 120, mr: 2 }} size="small">
+            <Select
+              value={i18n.language}
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              sx={{ color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.5)' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'white' }, '.MuiSvgIcon-root': { color: 'white' } }}
+              startAdornment={<LanguageIcon sx={{ mr: 1, color: 'white' }} />}
+            >
+              <MenuItem value="en">{t('language.en')}</MenuItem>
+              <MenuItem value="de">{t('language.de')}</MenuItem>
+            </Select>
+          </FormControl>
           <Button
             color="inherit"
             startIcon={<PdfIcon />}
             onClick={handleGeneratePDF}
             disabled={isGenerating}
           >
-            {isGenerating ? 'Generating...' : 'Generate PDF'}
+            {isGenerating ? t('app.generating') : t('app.generatePDF')}
           </Button>
         </Toolbar>
       </AppBar>
@@ -120,8 +141,8 @@ function App() {
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
         <Paper sx={{ width: '100%' }}>
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="main navigation tabs">
-            <Tab label="QR Code Data" id="tab-0" aria-controls="tabpanel-0" />
-            <Tab label="PDF Template" id="tab-1" aria-controls="tabpanel-1" />
+            <Tab label={t('tabs.qrCodeData')} id="tab-0" aria-controls="tabpanel-0" />
+            <Tab label={t('tabs.pdfTemplate')} id="tab-1" aria-controls="tabpanel-1" />
           </Tabs>
 
           <TabPanel value={tabValue} index={0}>
@@ -138,25 +159,22 @@ function App() {
 
         <Box sx={{ mt: 4, p: 3, bgcolor: 'grey.100', borderRadius: 1 }}>
           <Typography variant="h6" gutterBottom>
-            How to Use
+            {t('howToUse.title')}
           </Typography>
           <Typography variant="body2" component="div">
             <ol>
               <li>
-                <strong>Add QR Code Data:</strong> Use the "QR Code Data" tab to manually add entries or
-                import from a CSV file. Each entry can be either a link or an email message.
+                <strong>{t('howToUse.step1.title')}</strong> {t('howToUse.step1.description')}
               </li>
               <li>
-                <strong>Configure Template:</strong> Switch to the "PDF Template" tab to customize the
-                layout, including page size, QR code position, and text formatting.
+                <strong>{t('howToUse.step2.title')}</strong> {t('howToUse.step2.description')}
               </li>
               <li>
-                <strong>Generate PDF:</strong> Click the "Generate PDF" button in the top right to create
-                your printable PDF with all QR codes.
+                <strong>{t('howToUse.step3.title')}</strong> {t('howToUse.step3.description')}
               </li>
             </ol>
             <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-              All data is stored locally in your browser. Your data will persist between sessions.
+              {t('howToUse.localStorageNote')}
             </Typography>
           </Typography>
         </Box>
@@ -168,7 +186,7 @@ function App() {
       >
         <Container maxWidth="xl">
           <Typography variant="body2" color="text.secondary" align="center">
-            QR Code Badge Generator - All data is stored locally in your browser
+            {t('footer.text')}
           </Typography>
         </Container>
       </Box>

@@ -1,0 +1,94 @@
+{
+  "app": {
+    "title": "QR-Code Badge Generator",
+    "generatePDF": "PDF generieren",
+    "generating": "Generiere..."
+  },
+  "tabs": {
+    "qrCodeData": "QR-Code Daten",
+    "pdfTemplate": "PDF Vorlage"
+  },
+  "notifications": {
+    "noEntries": "Keine QR-Code Einträge gefunden. Bitte fügen Sie zuerst Einträge hinzu.",
+    "noTemplate": "Keine Vorlage ausgewählt. Bitte konfigurieren Sie zuerst eine Vorlage.",
+    "pdfSuccess": "PDF erfolgreich generiert!",
+    "pdfError": "Fehler beim Generieren der PDF. Bitte prüfen Sie die Konsole für Details.",
+    "importSuccess": "{{count}} Einträge erfolgreich importiert",
+    "importError": "Fehler beim Parsen der CSV: {{message}}",
+    "templateSaved": "Vorlage erfolgreich gespeichert!",
+    "fillRequired": "Bitte füllen Sie alle erforderlichen Felder aus",
+    "provideLink": "Bitte geben Sie einen Link an",
+    "provideEmail": "Bitte geben Sie E-Mail-Empfänger und Betreff an"
+  },
+  "howToUse": {
+    "title": "Anleitung",
+    "step1": {
+      "title": "QR-Code Daten hinzufügen:",
+      "description": "Verwenden Sie den \"QR-Code Daten\" Tab, um Einträge manuell hinzuzufügen oder aus einer CSV-Datei zu importieren. Jeder Eintrag kann entweder ein Link oder eine E-Mail-Nachricht sein."
+    },
+    "step2": {
+      "title": "Vorlage konfigurieren:",
+      "description": "Wechseln Sie zum \"PDF Vorlage\" Tab, um das Layout anzupassen, einschließlich Seitengröße, QR-Code Position und Textformatierung."
+    },
+    "step3": {
+      "title": "PDF generieren:",
+      "description": "Klicken Sie auf den \"PDF generieren\" Button oben rechts, um Ihre druckbare PDF mit allen QR-Codes zu erstellen."
+    },
+    "localStorageNote": "Alle Daten werden lokal in Ihrem Browser gespeichert. Ihre Daten bleiben zwischen den Sitzungen erhalten."
+  },
+  "footer": {
+    "text": "QR-Code Badge Generator - Alle Daten werden lokal in Ihrem Browser gespeichert"
+  },
+  "csvImport": {
+    "import": "CSV importieren",
+    "downloadTemplate": "Vorlage herunterladen",
+    "format": "CSV-Format: type, title, subtitle, link, email_to, email_cc, email_subject, email_body"
+  },
+  "qrCodeTable": {
+    "title": "QR-Code Einträge",
+    "addEntry": "Eintrag hinzufügen",
+    "columns": {
+      "type": "Typ",
+      "title": "Titel",
+      "subtitle": "Untertitel",
+      "content": "Inhalt",
+      "actions": "Aktionen"
+    },
+    "contentEmail": "An: {{to}}, Betreff: {{subject}}",
+    "noEntries": "Noch keine Einträge. Klicken Sie auf \"Eintrag hinzufügen\", um einen zu erstellen.",
+    "dialog": {
+      "addTitle": "Eintrag hinzufügen",
+      "editTitle": "Eintrag bearbeiten",
+      "type": "Typ",
+      "typeLink": "Link",
+      "typeEmail": "E-Mail",
+      "titleLabel": "Titel",
+      "subtitleLabel": "Untertitel",
+      "linkUrl": "Link URL",
+      "emailTo": "An (E-Mail)",
+      "emailCc": "CC (Optional)",
+      "emailSubject": "Betreff",
+      "emailBody": "Text",
+      "cancel": "Abbrechen",
+      "save": "Speichern"
+    }
+  },
+  "pdfTemplateDesigner": {
+    "title": "PDF Vorlagen Designer (PDFme)",
+    "description": "Verwenden Sie den visuellen Designer unten, um Ihre PDF-Vorlage anzupassen. Ziehen Sie Elemente per Drag & Drop, ändern Sie ihre Größe und konfigurieren Sie ihre Eigenschaften.",
+    "selectTemplate": "Vorlage auswählen",
+    "templateName": "Vorlagenname",
+    "createNew": "Neue erstellen",
+    "save": "Speichern",
+    "fieldNames": "Feldnamen:",
+    "fieldNamesDescription": "Verwenden Sie 'qrcode' für QR-Codes, 'title' für Titel und 'subtitle' für Untertitel. Der Designer füllt diese Felder automatisch beim Generieren von PDFs aus.",
+    "loading": "Lade Vorlagen Designer...",
+    "debugNoTemplate": "Keine Vorlage",
+    "debugNoPdfmeTemplate": "Keine pdfmeTemplate-Eigenschaft"
+  },
+  "language": {
+    "select": "Sprache",
+    "en": "English",
+    "de": "Deutsch"
+  }
+}

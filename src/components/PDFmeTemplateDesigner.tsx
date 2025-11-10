@@ -20,10 +20,12 @@ import { storageService } from '../services/storageService';
 
 interface PDFmeTemplateDesignerProps {
   onTemplateChange?: (template: PDFTemplateWrapper) => void;
+  onNotification?: (message: string, severity: 'success' | 'error' | 'warning' | 'info') => void;
 }
 
 export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
   onTemplateChange,
+  onNotification,
 }) => {
   const designerRef = useRef<HTMLDivElement>(null);
   const designerInstanceRef = useRef<Designer | null>(null);
@@ -123,7 +125,7 @@ export const PDFmeTemplateDesigner: React.FC<PDFmeTemplateDesignerProps> = ({
     storageService.updatePDFTemplate(updatedTemplate.id, updatedTemplate);
     loadTemplates();
     onTemplateChange?.(updatedTemplate);
-    alert('Template saved successfully!');
+    onNotification?.('Template saved successfully!', 'success');
   };
 
   const handleCreateNew = () => {

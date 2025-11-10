@@ -9,6 +9,8 @@ import {
   AppBar,
   Toolbar,
   Paper,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { PictureAsPdf as PdfIcon } from '@mui/icons-material';
 import { QRCodeTable } from './components/QRCodeTable';
@@ -46,6 +48,23 @@ function App() {
   const [currentTemplate, setCurrentTemplate] = useState<PDFTemplateWrapper | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    open: false,
+    message: '',
+    severity: 'info',
+  });
+
+  const showSnackbar = (message: string, severity: 'success' | 'error' | 'warning' | 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -59,22 +78,22 @@ function App() {
     const entries = storageService.getQRCodeEntries();
     
     if (entries.length === 0) {
-      alert('No QR code entries found. Please add some entries first.');
+      showSnackbar('No QR code entries found. Please add some entries first.', 'warning');
       return;
     }
 
     if (!currentTemplate) {
-      alert('No template selected. Please configure a template first.');
+      showSnackbar('No template selected. Please configure a template first.', 'warning');
       return;
     }
 
     setIsGenerating(true);
     try {
       await pdfService.generatePDF(entries, currentTemplate);
-      alert('PDF generated successfully!');
+      showSnackbar('PDF generated successfully!', 'success');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please check the console for details.');
+      showSnackbar('Error generating PDF. Please check the console for details.', 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -107,13 +126,13 @@ function App() {
 
           <TabPanel value={tabValue} index={0}>
             <Box sx={{ mb: 3 }}>
-              <CSVImport onImportComplete={handleDataChange} />
+              <CSVImport onImportComplete={handleDataChange} onNotification={showSnackbar} />
             </Box>
-            <QRCodeTable key={refreshKey} onDataChange={handleDataChange} />
+            <QRCodeTable key={refreshKey} onDataChange={handleDataChange} onNotification={showSnackbar} />
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            <PDFmeTemplateDesigner onTemplateChange={setCurrentTemplate} />
+            <PDFmeTemplateDesigner onTemplateChange={setCurrentTemplate} onNotification={showSnackbar} />
           </TabPanel>
         </Paper>
 
@@ -153,6 +172,17 @@ function App() {
           </Typography>
         </Container>
       </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

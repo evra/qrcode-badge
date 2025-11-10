@@ -7,6 +7,7 @@ import { storageService } from '../services/storageService';
 
 interface CSVImportProps {
   onImportComplete: () => void;
+  onNotification?: (message: string, severity: 'success' | 'error' | 'warning' | 'info') => void;
 }
 
 interface CSVRow {
@@ -20,7 +21,7 @@ interface CSVRow {
   email_body?: string;
 }
 
-export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
+export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete, onNotification }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +60,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
         const existingEntries = storageService.getQRCodeEntries();
         storageService.saveQRCodeEntries([...existingEntries, ...entries]);
 
-        alert(`Successfully imported ${entries.length} entries`);
+        onNotification?.(`Successfully imported ${entries.length} entries`, 'success');
         onImportComplete();
 
         // Reset file input
@@ -68,7 +69,7 @@ export const CSVImport: React.FC<CSVImportProps> = ({ onImportComplete }) => {
         }
       },
       error: (error) => {
-        alert(`Error parsing CSV: ${error.message}`);
+        onNotification?.(`Error parsing CSV: ${error.message}`, 'error');
       },
     });
   };

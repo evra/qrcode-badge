@@ -27,9 +27,10 @@ import { storageService } from '../services/storageService';
 
 interface QRCodeTableProps {
   onDataChange?: () => void;
+  onNotification?: (message: string, severity: 'success' | 'error' | 'warning' | 'info') => void;
 }
 
-export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange }) => {
+export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange, onNotification }) => {
   const [entries, setEntries] = useState<QRCodeEntry[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEntry, setEditingEntry] = useState<QRCodeEntry | null>(null);
@@ -74,17 +75,17 @@ export const QRCodeTable: React.FC<QRCodeTableProps> = ({ onDataChange }) => {
 
   const handleSave = () => {
     if (!formData.title || !formData.type) {
-      alert('Please fill in all required fields');
+      onNotification?.('Please fill in all required fields', 'warning');
       return;
     }
 
     if (formData.type === 'link' && !formData.link) {
-      alert('Please provide a link');
+      onNotification?.('Please provide a link', 'warning');
       return;
     }
 
     if (formData.type === 'email' && (!formData.email?.to || !formData.email?.subject)) {
-      alert('Please provide email recipient and subject');
+      onNotification?.('Please provide email recipient and subject', 'warning');
       return;
     }
 
